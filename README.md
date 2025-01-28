@@ -1,6 +1,7 @@
-# Lab: shell scripting 
+# Lab: Working with Processes
 
-This lab will teach you the shell scripting and command line tools you will need to complete the twitter analysis homework.
+This lab will teach you how to run tasks in parallel in the shell.
+This is the first steps in completing your twitter analysis homework.
 
 <!--
 Portions of this lab require you to work with a partner.
@@ -32,8 +33,14 @@ You should get output that looks similar to
 ```
 -rw-r--r-- 1 user user 52 Jan 22 13:16 script.sh
 ```
-The left-hand sequence of `-rw-r--r--` describes the permissions of the file.
-This file has read/write permissions for the user (you), and read permissions for everyone else.
+The left-hand sequence of `-rw-r--r--` describes the permissions of the file,
+and is particularly important to understand.
+In this case, the file has read/write permissions for the user (you), and read permissions for everyone else.
+
+The general semantics of the permission string are summarized in the following picture:
+
+<img src=img/file_permissions.png />
+
 For more details on how to read these permission strings, see [this link](https://mason.gmu.edu/~montecin/UNIXpermiss.htm).
 
 <!--
@@ -266,10 +273,10 @@ This should be done if a polite kill request didn't work.
 > There's lots of programming jokes about these concepts.
 > For example:
 > 
-> <img src=kill.webp width=300px />
+> <img src=img/kill.webp width=300px />
 > <br>
 > <br>
-> <img src=kill2.webp width=300px />
+> <img src=img/kill2.webp width=300px />
 
 ### Multiple connections
 
@@ -543,6 +550,7 @@ command to sakai.
 If you finish early, you should start the typespeed caveat task if you have not already done so.
 At this point, you have seen all of the terminal tricks needed to understand both the main task and the extra credit.
 
+<!--
 ## Optional: Hacking your classmate's github accounts
 
 Recall that *hacking* in the computer world means doing something cool.
@@ -590,6 +598,7 @@ and I may choose to have "fun" with your account later if you don't disable them
 The vast majority of times when a company is hacked,
 it is because sensitive information was not stored correctly with proper access controls.
 This allows people from the public who shouldn't have access to the information (whether it be passwords, client information, or other trade secrets) to gain access.
+-->
 
 <!--
 ### Hacking your partner (2)
