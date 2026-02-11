@@ -1,7 +1,7 @@
 # Lab: Working with Processes
 
 This lab will teach you how to run tasks in parallel in the shell.
-This is the first steps in completing your twitter analysis homework.
+This is the first step in completing your twitter analysis homework.
 
 <!--
 Portions of this lab require you to work with a partner.
