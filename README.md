@@ -380,7 +380,7 @@ ending the process.
 > **NOTE:**
 > Be default on most Linux machines, the `ssh` program sends the `HUP` signal automatically when it disconnects.
 > This is polite to do:
-> Since we know we won't be using those processes any more, we should kill them and free their resources.
+> Since we know we won't be using those processes anymore, we should kill them and free their resources.
 > But on some machines (especially Macs), the `ssh` program is configured to not send the `HUP` signal automatically.
 > Therefore, the programs will not be immediately terminated.
 > The lambda server waits about ten minutes before sending the `HUP` signal and terminating the processes itself.
