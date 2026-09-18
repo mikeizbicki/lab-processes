@@ -380,7 +380,7 @@ the `HUP` signal was sent to the `script.sh` process,
 ending the process.
 
 > **NOTE:**
-> Be default on most Linux machines, the `ssh` program sends the `HUP` signal automatically when it disconnects.
+> By default on most Linux machines, the `ssh` program sends the `HUP` signal automatically when it disconnects.
 > This is polite to do:
 > Since we know we won't be using those processes anymore, we should kill them and free their resources.
 > But on some machines (especially Macs), the `ssh` program is configured to not send the `HUP` signal automatically.
