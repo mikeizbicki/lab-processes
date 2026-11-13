@@ -1,6 +1,6 @@
 # Lab: Working with Processes
 
-This lab will teach you how to run tasks in parallel in the shell.
+This lab will teach you how to run tasks in parallel in the linux shell.
 A later assignment will have you using these techniques to do a large scale MapReduce parallel analysis of 3 terabytes of twitter data.
 
 <img src=img/meme.jpg width=400px />
