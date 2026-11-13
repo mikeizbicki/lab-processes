@@ -346,10 +346,20 @@ $ ps -ef | grep <username>
 You can see what processes other users are running with the same command.
 Just replace `<username>` with their username instead.
 
-> **EXERCISE:**
-> Use `ps -ef | grep <username>` to find the processes that your partner is running.
-> Observe that you an see what everyone on the lambda server is doing,
-> not just what you are doing.
+Use `ps -ef | grep <username>` to find the processes that your partner is running.
+Observe that you an see what everyone on the lambda server is doing,
+not just what you are doing.
+
+Now select one of their pid numbers.
+Run
+```
+$ kill <partner_pid>
+$ kill -9 <partner_pid>
+```
+Observe that you don't have permission to kill other people's processes on the lambda server.
+(And they don't have permission to kill yours.)
+
+So you all cannot accidentally break someone else's programs even if you accidentally run the wrong `kill` commands.
 
 ### The `HUP` signal
 
