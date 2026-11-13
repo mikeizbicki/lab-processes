@@ -1,12 +1,12 @@
 # Lab: Working with Processes
 
 This lab will teach you how to run tasks in parallel in the shell.
-This is the first step in completing your twitter analysis homework.
+A later assignment will have you using these techniques to do a large scale MapReduce parallel analysis of 3 terabytes of twitter data.
 
 <img src=img/meme.jpg width=400px />
 
-<!--
 Portions of this lab require you to work with a partner.
+<!--
 So you should pair up with another student.
 Both of you should complete the lab on your own computers,
 but you will have to run certain commands for your partner on your own computer at different steps.
@@ -45,8 +45,11 @@ The general semantics of the permission string are summarized in the following p
 
 For more details on how to read these permission strings, see [this link](https://mason.gmu.edu/~montecin/UNIXpermiss.htm).
 
-<!--
-### Hacking your partner's account (pt 1)
+### "Hacking" your partner's account
+
+Recall that to computer programmers, *hacking* is a synonym for doing something cool.
+*Cracking* is actually breaking computers and what most muggles mean when they talk about "hacking".
+In this section, we will see a brief peak into how some "cracking" attacks work due to misconfigurations.
 
 By default, everyone has read access to everyone else's home folder.
 Change your current working directory to be your partner's home folder by running the command
@@ -75,25 +78,30 @@ $ chmod a+w /home/username/script.sh
 again, where `username` is replaced by their real username.
 Now you have write permission on the file,
 and you can edit it in Vim.
+Add a line `echo "hello <partnername>!"` and have the partner run the file.
 
-**TASK:**
-Change the permissions of your home folder so that other users cannot read the contents of your files.
-Note, you should change the permissions of the folder `/home/username` and not the permissions of each individual file.
-This will ensure that any new files you create are also hidden.
+It is bad practice to give someone else write access to a file that you might execute.
+Because they might change the file to do any arbitrary commands.
+Above we only added a nice hello message,
+but the other person could have deleting the contents of your home folder,
+or launched an attack against government webpages.
+And everyone will think it was *you* who did that,
+and *you* would get arrested.
 
-**NOTE:**
-Essentially all hacking boils down to understanding how a computer system is configured differently than the admin of the computer thinks.
-Hackers exploit this misconfiguration to their advantage.
--->
+Essentially all cracking boils down to understanding how a computer system is configured differently than the admin of the computer thinks.
+Crackers exploit this misconfiguration to their advantage.
+
+> **OPTIONAL:**
+> Change the permissions of your home folder so that other users cannot read the contents of your files.
+> Note, you should change the permissions of the folder `/home/username` and not the permissions of each individual file.
+> This will ensure that any new files you create are also hidden.
 
 ### Running the shell file
 
-<!--
 Return to your home folder by running
 ```
 $ cd
 ```
--->
 Now, try to execute your script by running the command
 ```
 $ ./script.sh
@@ -338,14 +346,19 @@ $ ps -ef | grep <username>
 You can see what processes other users are running with the same command.
 Just replace `<username>` with their username instead.
 
+> **EXERCISE:**
+> Use `ps -ef | grep <username>` to find the processes that your partner is running.
+> Observe that you an see what everyone on the lambda server is doing,
+> not just what you are doing.
+
 ### The `HUP` signal
 
-We've seen three ways to kill processes:
+So far, we've seen three ways to kill processes:
 pressing `^C`, running the `kill` command, and running the `kill -9` command.
 Another way to kill processes is by sending the `HUP` signal.
 The `HUP` signal is automatically sent to all "children" processes of your shell when the connection is closed (`HUP` stands for "hang up").
 This ensures that you don't accidentally leave processes running on machines that you're not actively using.
-If we didn't have the `HUP` signal, then everytime bad wifi disconnected you from the lambda server,
+If we didn't have the `HUP` signal, then every time bad wifi disconnected you from the lambda server,
 your `vim` and `bash` processes would continue running forever,
 and eventually the lambda server would run out of resources.
 
@@ -460,15 +473,45 @@ to watch the contents of `output3` grow as `script.sh` appends to it.
 We now have all the tools we need to write a program to analyze terabytes of tweets massively in parallel.
 We'll start by counting how many times the word "coronavirus" was used in each month of the year 2020.
 
-<!--
-Recall that in the [pipes lab](https://github.com/mikeizbicki/lab-pipes-twitter), we created commands that counted the number of tweets sent on a particular day:
+Recall that in [lab-twitter-pipes](https://github.com/mikeizbicki/lab-pipes-twitter), we created commands that counted the number of tweets sent on a particular day:
 ```
 $ unzip -p '/data/Twitter dataset/geoTwitter20-04-01.zip' | grep -i "coronavirus" | wc -l
 ```
 This command first unzips the file, then uses grep to remove tweets that don't contain "coronavirus", and counts the number of tweets that remain.
 Our goal is to run a command like this for the first day of each month.
-(We'll start by running on just 12 days before jumping up to all 1800 in the dataset.)
--->
+
+First, let's write a glob that captures the first day of each month:
+```
+$ echo '/data/Twitter dataset/'geoTwitter20-*-01.zip
+```
+Observe that we put `/data/Twitter dataset/` in quotation marks because that portion of the path contains a space.
+Then the glob will match all of the months.
+
+Next, let's put this in a for loop.
+It looks like:
+```
+for file in '/data/Twitter dataset/'geoTwitter20-*-01.zip; do
+    echo "$file"
+done
+```
+The syntax is similar to python.
+The name of the variable we are looping over goes between the `for` and `in` keywords, and the list of values goes after `in`.
+The two differences are:
+1. The list of values is not contained in `[]` and comma separated; it is just whatever the glob evaluates to.
+2. We "access" a variable name by putting the `$` in front of it.
+    `file` refers to an actual file named `file`, and `$file` gets expanded to the contents of a variable.
+
+Finally, we need to run our `unzip ... wc -l` command from above for each file.
+We can do that with the `$(...)` syntax, which runs the command inside of it and passes it as an argument to another command.
+For example,
+```
+echo $(unzip -p '/data/Twitter dataset/geoTwitter20-04-01.zip' | grep -i "coronavirus" | wc -l)
+```
+is the same as
+```
+unzip -p '/data/Twitter dataset/geoTwitter20-04-01.zip' | grep -i "coronavirus" | wc -l
+```
+We are now ready to combine all the techniques we've learned to analyze our twitter files in parallel.
 
 Create a file called `lab.sh` with the following code inside of it:
 ```
@@ -477,10 +520,6 @@ for file in '/data/Twitter dataset/'geoTwitter20-*-01.zip; do
     echo "$file" "$(unzip -p "$file" | grep -i coronavirus | wc -l)" &
 done
 ```
-
-> **NOTE:**
-> Ensure that you understand what everything in the code block above does.
-> For your homework, you will have to write files like this from scratch.
 
 Give yourself execute permissions to the file by running
 ```
@@ -527,7 +566,7 @@ at that point, all of the programs have terminated.
 > My parallel program ran "only" about 8x faster due to this bottleneck.
 > More CPU intensive code, however, can get up to an 80x speed up by running in parallel on the lambda server.
 
-Once your analysis is done, you can view the results that you save with output redirection:
+Once your analysis is done, you can view the results that you saved with output redirection:
 ```
 $ cat output
 ```
@@ -535,6 +574,8 @@ Unfortunately, you'll notice that the results are not in chronological order.
 Instead, they are listed in the order that the files finished processing.
 Parallel programming is what we call *nondeterministic*,
 which means that the order of the results will change everytime you run the program due to factors outside of our control.
+
+<img src=img/cat.jpg width=400px />
 
 Fortunately, we can easily recover a chronological ordering using the `sort` command:
 ```
@@ -559,7 +600,7 @@ Recall that *hacking* in the computer world means doing something cool.
 What muggles think of as "hacking" is actually what hackers call *cracking*.
 In this last section of the lab, you will *crack* into other user's github accounts.
 
-Many of you have sored your personal access token in a file called `pat` in your home folder.
+Many of you have stored your personal access token in a file called `pat` in your home folder.
 (This is how I recommended you store your pat.)
 Unfortunately, the default permissions for files includes read permissions for all users.
 This means that everyone has access to your pat and can use it to login to github under your account name.
